@@ -11,12 +11,11 @@ function sarsalambda(p)
 
 	if p.plot
 		f = figure(1);
-		hold on
-		set(gcf,'CurrentCharacter','@'); % set to a dummy character
 	end
 
     x = logical(zeros(p.ntile * p.ntile, 3)); % features
 	w = zeros(size(x));
+	steps = zeros(1e7, 1);
 
     i = 0;
 	while true % For each episode
@@ -24,11 +23,12 @@ function sarsalambda(p)
 		z = zeros(size(x));
         step = 0;
         % State initialised
-        car = Car(0.0); 
+        car = Car(rand() * 1.8 - 1.2); 
 
         % Initialise the action A
         A = 3;
 
+        fprintf('Episode: %d\n', i);
         while true
 	        x = getFeatures(car, A, p, x);
         	z(x) = 1; % Replacing traces
@@ -55,7 +55,6 @@ function sarsalambda(p)
 		            Q(a) = sum(w(x));
 		        end
 
-		        disp(['Q:',num2str(Q)])
 		        [~, A] = max(Q, [], 2); % New on-policy action
 	            delta = delta + p.gamma * Q(A);
             end
@@ -64,35 +63,48 @@ function sarsalambda(p)
             z = p.gamma * p.lambda * z; % Does not take effects if replace traces
 
         	step = step + 1;
-        	fprintf('Episode:%d\tStep:%d\tdelta:%.2f\tA:%d\tp:%.2f\tv:%.2f\n', ...
-        		i, step, delta, A, get(car, 'p'), get(car, 'v'));
 
-        	if p.plot
-	            draw(car, f);
+        	if p.plot && rem(i, p.showevery) == 0
+	        	% fprintf('Episode:%d\tStep:%d\tdelta:%.2f\tA:%d\tp:%.2f\tv:%.2f\n', ...
+	        	% 	i, step, delta, A, get(car, 'p'), get(car, 'v'));
+	            drawCar(f, car);
 	        end
 	    end
-	end
 
-	if p.plot
-		hold off;
+	    steps(i) = step;
+
+    	if p.plot && rem(i, p.showevery) == 0
+            drawSpeed(f, steps(1:i));
+	    end
 	end
 
 end
 
 
-function draw(car, f)
+function drawCar(f, car)
+	hold on
 	clf(f);
+	subplot(2,1,1);
 	line([-1.2, 0.6], [0, 0]);
 	car.draw();
 	axis equal;
-	drawnow;
 	% M(i) = getframe;
 	% i = i + 1;
 	if get(car, 'p') >= 0.6
 		txt1 = 'Right Bound Reached';
 		text(get(car, 'p') - 0.4, 0.2, txt1);
 	end
+	drawnow;
+	hold off
+
 end	
+
+function drawSpeed(f, steps)
+	clf(f);
+	subplot(2,1,2)
+    plot(steps)
+    drawnow
+end
 
 function car = takeAction(car, I)
     switch I
