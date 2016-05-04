@@ -23,19 +23,37 @@ function mountaincardemo()
 		    c.nothrottle();
 		end
 
-		clf(f);
-		% Draw a line to represent the mountain 
-		line([-1.2, 0.6], [0, 0]);
-		c.draw();
-		axis equal;
-		drawnow;
-		i = i + 1;
-		if get(c, 'p') >= 0.6
-			txt1 = 'Right Bound Reached';
-			text(get(c, 'p') - 0.4, 0.2, txt1);
-			break;
-		end
+		drawCar(f, c, false);
 	end
 
 	hold off
 end
+
+function drawCar(f, car, flat)
+	hold on
+	clf(f);
+	subplot(2,1,1);
+	if flat
+		line([-1.2, 0.6], [0, 0]);
+		car.draw();
+	else
+		R = 5;
+		viscircles([0,0], R);
+		p = get(car, 'p');
+		d = (p + 1.2) / 1.8;
+		theta = d * pi;
+		x = - cos(theta) * R;
+		y = - sin(theta) * R;
+		viscircles([x, y], 0.4);
+	end
+	axis equal;
+	% M(i) = getframe;
+	% i = i + 1;
+	if get(car, 'p') >= 0.6
+		txt1 = 'Right Bound Reached';
+		text(get(car, 'p') - 0.4, 0.2, txt1);
+	end
+	drawnow;
+	hold off
+
+end	

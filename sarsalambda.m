@@ -67,7 +67,7 @@ function sarsalambda(p)
         	if p.plot && rem(i, p.showevery) == 0
 	        	% fprintf('Episode:%d\tStep:%d\tdelta:%.2f\tA:%d\tp:%.2f\tv:%.2f\n', ...
 	        	% 	i, step, delta, A, get(car, 'p'), get(car, 'v'));
-	            drawCar(f, car);
+	            drawCar(f, car, false);
 	        end
 	    end
 
@@ -81,12 +81,23 @@ function sarsalambda(p)
 end
 
 
-function drawCar(f, car)
+function drawCar(f, car, flat)
 	hold on
 	clf(f);
 	subplot(2,1,1);
-	line([-1.2, 0.6], [0, 0]);
-	car.draw();
+	if flat
+		line([-1.2, 0.6], [0, 0]);
+		car.draw();
+	else
+		R = 5;
+		viscircles([0,0], R);
+		p = get(car, 'p');
+		d = (p + 1.2) / 1.8;
+		theta = d * pi;
+		x = - cos(theta) * R;
+		y = - sin(theta) * R;
+		viscircles([x, y], 0.4);
+	end
 	axis equal;
 	% M(i) = getframe;
 	% i = i + 1;
