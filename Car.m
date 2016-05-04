@@ -1,10 +1,10 @@
-classdef Car<handle
-    properties (Access = private)
+classdef Car < matlab.mixin.SetGet
+    properties 
         p % Position
         v % Velosity
     end
     
-    methods (Access = public)
+    methods 
         function obj = Car(p)
             obj.p = p;	
             obj.v = 0;
@@ -28,14 +28,6 @@ classdef Car<handle
 
         function obj = draw(obj)
             rectangle('Position', [obj.p - 0.03, 0, 0.06, 0.03]);
-        end
-
-        function p = getPosition(obj)
-            p = obj.p;
-        end
-
-        function v = getVelocity(obj)
-        	v = obj.v;
         end
 
 	end
